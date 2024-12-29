@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgage Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        .calculator h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .calculator label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .calculator input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .calculator button {
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .calculator button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            text-align: center;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Mortgage Calculator</h1>
+        <label for="purchase-price">Purchase Price ($):</label>
+        <input type="number" id="purchase-price" placeholder="Enter purchase price" oninput="updateLoanAmount()">
+
+        <label for="down-payment">Down Payment (%):</label>
+        <input type="number" id="down-payment" placeholder="Enter down payment percentage" oninput="updateLoanAmount()">
+
+        <label for="loan-amount">Loan Amount ($):</label>
+        <input type="number" id="loan-amount" placeholder="Calculated loan amount" readonly>
+
+        <label for="interest-rate">Interest Rate (%):</label>
+        <input type="number" id="interest-rate" placeholder="Enter annual interest rate">
+
+        <label for="loan-term">Loan Term (years):</label>
+        <input type="number" id="loan-term" placeholder="Enter loan term in years">
+
+        <label for="property-taxes">Property Taxes ($/year):</label>
+        <input type="number" id="property-taxes" placeholder="Enter annual property taxes">
+
+        <label for="home-insurance">Home Insurance ($/year):</label>
+        <input type="number" id="home-insurance" placeholder="Enter annual home insurance">
+
+        <label for="hoa-fees">HOA Fees ($/month):</label>
+        <input type="number" id="hoa-fees" placeholder="Enter monthly HOA fees">
+
+        <label for="mortgage-insurance">Mortgage Insurance ($/month):</label>
+        <input type="number" id="mortgage-insurance" placeholder="Enter monthly mortgage insurance">
+
+        <button onclick="calculateMortgage()">Calculate</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function updateLoanAmount() {
+            const purchasePrice = parseFloat(document.getElementById('purchase-price').value);
+            const downPaymentPercent = parseFloat(document.getElementById('down-payment').value) / 100;
+
+            if (!isNaN(purchasePrice) && !isNaN(downPaymentPercent)) {
+                const loanAmount = purchasePrice * (1 - downPaymentPercent);
+                document.getElementById('loan-amount').value = loanAmount.toFixed(2);
+            } else {
+                document.getElementById('loan-amount').value = '';
+            }
+        }
+
+        function calculateMortgage() {
+            const purchasePrice = parseFloat(document.getElementById('purchase-price').value);
+            const downPaymentPercent = parseFloat(document.getElementById('down-payment').value) / 100;
+            const loanAmountField = document.getElementById('loan-amount');
+
+            if (isNaN(purchasePrice) || isNaN(downPaymentPercent) || purchasePrice <= 0 || downPaymentPercent < 0) {
+                document.getElementById('result').textContent = 'Please enter valid purchase price and down payment percentage.';
+                return;
+            }
+
+            const loanAmount = purchasePrice * (1 - downPaymentPercent);
+            loanAmountField.value = loanAmount.toFixed(2);
+
+            const interestRate = parseFloat(document.getElementById('interest-rate').value) / 100 / 12;
+            const loanTerm = parseInt(document.getElementById('loan-term').value) * 12;
+            const propertyTaxes = parseFloat(document.getElementById('property-taxes').value) / 12 || 0;
+            const homeInsurance = parseFloat(document.getElementById('home-insurance').value) / 12 || 0;
+            const hoaFees = parseFloat(document.getElementById('hoa-fees').value) || 0;
+            const mortgageInsurance = parseFloat(document.getElementById('mortgage-insurance').value) || 0;
+
+            if (isNaN(interestRate) || isNaN(loanTerm) || loanTerm <= 0) {
+                document.getElementById('result').textContent = 'Please enter valid loan details.';
+                return;
+            }
+
+            const principalAndInterest = (loanAmount * interestRate * Math.pow(1 + interestRate, loanTerm)) / (Math.pow(1 + interestRate, loanTerm) - 1);
+            const totalMonthlyPayment = principalAndInterest + propertyTaxes + homeInsurance + hoaFees + mortgageInsurance;
+
+            document.getElementById('result').textContent = `Your total monthly payment is $${totalMonthlyPayment.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>
